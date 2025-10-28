@@ -9,8 +9,10 @@ import pandas as pd
 
 from src.quantization_tests import tensorfi2_fakequant as tfi
 import time, sys
-TRAINING_FILE_LOCATION = '../GTSRB_Dataset/Final_Training/Images/'
-TEST_FILE_LOCATION = "../GTSRB_Dataset/Final_Test/Images/"
+
+
+TRAINING_FILE_LOCATION = 'GTSRB/Final_Training/Images/'
+TEST_FILE_LOCATION = "GTSRB/Final_Test/Images/"
 im = cv2.imread(TRAINING_FILE_LOCATION + '00000/00000_00000.ppm') 
 print(im.shape)
 
@@ -44,12 +46,12 @@ trainy = np.load('./Data/trainy.npy', allow_pickle=True)
 
  #get path for test images
 testfile = pd.read_csv(TEST_FILE_LOCATION +'GT-final_test.test.csv', sep=";")['Filename'].apply(lambda x: TEST_FILE_LOCATION + x).tolist()
-
+print(testfile)
 
 X_test = np.array([cv2.resize(cv2.imread(fname), (32, 32), interpolation = cv2.INTER_AREA) for fname in testfile])
 X_test.dump('./Data/testx.npy')
 
-y_test = np.array(pd.read_csv('../GTSRB_Dataset/GT-final_test.csv', sep=";")['ClassId'])
+y_test = np.array(pd.read_csv('GTSRB/GT-final_test.csv', sep=";")['ClassId'])
 y_test.dump('./Data/testy.npy')
 
 # load data from pickle
