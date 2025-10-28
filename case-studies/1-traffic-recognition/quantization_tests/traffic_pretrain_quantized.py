@@ -7,7 +7,7 @@ import pickle
 import numpy as np
 import pandas as pd
 
-from src import tensorfi2 as tfi
+from src.quantization_tests import tensorfi2_fakequant as tfi
 import time, sys
 TRAINING_FILE_LOCATION = '../GTSRB_Dataset/Final_Training/Images/'
 TEST_FILE_LOCATION = "../GTSRB_Dataset/Final_Test/Images/"
