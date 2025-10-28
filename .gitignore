@@ -219,4 +219,6 @@ __marimo__/
 GTSRB/
 
 #data dump
-/Data
+Data/
+
+.vscode/
