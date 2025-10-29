@@ -7,7 +7,7 @@ import pickle
 import numpy as np
 import pandas as pd
 
-from src.quantization_tests import tensorfi2_fakequant as tfi
+from src import tensorfi2 as tfi
 import time, sys
 
 
