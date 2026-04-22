@@ -222,7 +222,9 @@ GTSRB/
 Data/*
 h5/*
 results/*
+CIFAR10/*
 
 !results/.gitkeep
 !Data/.gitkeep
 !h5/.gitkeep
+!CIFAR10/.gitkeep

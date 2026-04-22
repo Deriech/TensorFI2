@@ -1,0 +1,4 @@
+## Command to run quantized machine learning FI.
+## Make sure that you download the GTSRB Dataset and setup your python environment first
+
+python case-studies/1-traffic-recognition/quantization_tests/traffic_pretrain_quantized.py conf/sample.yaml results 1

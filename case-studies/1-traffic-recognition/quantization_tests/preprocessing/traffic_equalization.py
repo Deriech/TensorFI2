@@ -6,53 +6,22 @@ import glob
 import pickle
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
 from src import tensorfi2 as tfi
 import time, sys
 
-# im = cv2.imread('../Train/0/00000_00000_00000.png') 
-# print(im.shape)
-'''
- function to read and resize images, get labels and store them into np array
-def get_image_label_resize(label, filelist, dim = (32, 32), dataset = 'Train'):
-    x = np.array([cv2.resize(cv2.imread(fname), dim, interpolation = cv2.INTER_AREA) for fname in filelist])
-    y = np.array([label] * len(filelist))
-        
-    #print('{} examples loaded for label {}'.format(x.shape[0], label))
-    return (x, y)    
-    
- data for label 0. I store them in parent level so that they won't be uploaded to github
-filelist = glob.glob('../Train/'+'0'+'/*.png')
-trainx, trainy = get_image_label_resize(0, glob.glob('../Train/'+str(0)+'/*.png'))
 
- go throgh all others labels and store images into np array
-for label in range(1, 43):
-    filelist = glob.glob('../Train/'+str(label)+'/*.png')
-    x, y = get_image_label_resize(label, filelist)
-    trainx = np.concatenate((trainx ,x))
-    trainy = np.concatenate((trainy ,y))
+TRAINING_FILE_LOCATION = 'GTSRB/Final_Training/Images/'
+TEST_FILE_LOCATION = "GTSRB/Final_Test/Images/"
 
- save data into a pickle to later use
-trainx.dump('../trainx.npy')
-trainy.dump('../trainy.npy')
-'''
+
 # load data from pickle
-trainx = np.load('../trainx.npy', allow_pickle=True)
-trainy = np.load('../trainy.npy', allow_pickle=True)
-'''
- get path for test images
-testfile = pd.read_csv('Test.csv')['Path'].apply(lambda x: '../' + x).tolist()
- print(testfile)
+trainx = np.load('./Data/trainx_processed.npy', allow_pickle=True)
+trainy = np.load('./Data/trainy.npy', allow_pickle=True)
 
-X_test = np.array([cv2.resize(cv2.imread(fname), (32, 32), interpolation = cv2.INTER_AREA) for fname in testfile])
-X_test.dump('../testx.npy')
-
-y_test = np.array(pd.read_csv('Test.csv')['ClassId'])
-y_test.dump('../testy.npy')
-'''
 # load data from pickle
-X_test = np.load('../testx.npy', allow_pickle=True)
-y_test = np.load('../testy.npy', allow_pickle=True)
+X_test = np.load('./Data/testx_processed.npy', allow_pickle=True)
+y_test = np.load('./Data/testy.npy', allow_pickle=True)
 
 # shuffle training data and split them into training and validation
 indices = np.random.permutation(trainx.shape[0])
@@ -68,21 +37,18 @@ n_validation = X_validation.shape[0]
 n_test = X_test.shape[0]
 image_shape = X_train[0].shape
 n_classes = len(np.unique(y_train))
-# print("There are {} training examples ".format(n_train))
-# print("There are {} validation examples".format(n_validation))
-# print("There are {} testing examples".format(n_test))
-# print("Image data shape is {}".format(image_shape))
-# print("There are {} classes".format(n_classes))
+print("There are {} training examples ".format(n_train))
+print("There are {} validation examples".format(n_validation))
+print("There are {} testing examples".format(n_test))
+print("Image data shape is {}".format(image_shape))
+print("There are {} classes".format(n_classes))
 
-# convert the images to grayscale
-X_train_gry = np.sum(X_train/3, axis=3, keepdims=True)
-X_validation_gry = np.sum(X_validation/3, axis=3, keepdims=True)
-X_test_gry = np.sum(X_test/3, axis=3, keepdims=True)
+
 
 # Normalize data
-X_train_normalized_gry = (X_train_gry-128)/128
-X_validation_normalized_gry = (X_validation_gry-128)/128
-X_test_normalized_gry = (X_test_gry-128)/128
+X_train_normalized_gry = (X_train-128)/128
+X_validation_normalized_gry = (X_validation-128)/128
+X_test_normalized_gry = (X_test-128)/128
 
 
 # update the train, val and test data with normalized gray images
@@ -120,13 +86,13 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 # training batch_size=128, epochs=10
-#conv = model.fit(X_train, y_train, batch_size=128, epochs=10,
-#        validation_data=(X_validation, y_validation))
+conv = model.fit(X_train, y_train, batch_size=128, epochs=10,
+        validation_data=(X_validation, y_validation))
 
-#model.save_weights('h5/traffic-trained.h5')
+model.save_weights('h5/traffic-trained.weights.h5')
 
-model.load_weights('h5/traffic-trained.h5')
-'''
+model.load_weights('h5/traffic-trained.weights.h5')
+
 tesX = []
 for i in range(43):
 	tesX.append([])
@@ -136,11 +102,11 @@ for i in range(len(X_test)):
 	if(acc == 1.):
 		tesX[int(y_test[i:i+1])].append(i)
 
-with open("tesX.txt", "wb") as fp:
+with open("Data/tesX.txt", "wb") as fp:
 	pickle.dump(tesX, fp)
-'''
 
-with open("tesX.txt", "rb") as fp:
+
+with open("Data/tesX.txt", "rb") as fp:
     tesX = pickle.load(fp)
 
 for i in range(43):
@@ -159,15 +125,18 @@ filePath = os.path.join(filePath, "res.csv")
 
 f = open(filePath, "w")
 numFaults = int(sys.argv[3])
-
+print('numfaults =', numFaults)
 for k in range(numFaults):
+    print("Trial",k+1,"of",numFaults)
     for i in range(43):
         count = 0.
         tesXi = tesX[i]
         for j in range(30):
             res = tfi.inject(model=model, x_test=X_test[tesXi[j:j+1]], confFile=conf)
-            if (res == i):
+            if (res.res == i):
                 count = count + 1.
+            else:
+                continue
         countX[i] = countX[i] + count
 
 for i in range(43):

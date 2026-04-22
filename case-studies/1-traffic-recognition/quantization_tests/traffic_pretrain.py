@@ -6,7 +6,7 @@ import glob
 import pickle
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
 from src import tensorfi2 as tfi
 import time, sys
 
@@ -46,7 +46,7 @@ trainy = np.load('./Data/trainy.npy', allow_pickle=True)
 
  #get path for test images
 testfile = pd.read_csv(TEST_FILE_LOCATION +'GT-final_test.test.csv', sep=";")['Filename'].apply(lambda x: TEST_FILE_LOCATION + x).tolist()
-print(testfile)
+#print(testfile)
 
 X_test = np.array([cv2.resize(cv2.imread(fname), (32, 32), interpolation = cv2.INTER_AREA) for fname in testfile])
 X_test.dump('./Data/testx.npy')

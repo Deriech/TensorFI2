@@ -39,7 +39,7 @@ class inject():
 
 		# Call the corresponding FI function
 		fiFunc = getattr(self, fiConf["Target"])
-		fiFunc(model, fiConf, **kwargs)
+		self.res = fiFunc(model, fiConf, **kwargs)
 
 	def layer_states(self, model, fiConf, **kwargs):
 		
@@ -182,8 +182,9 @@ class inject():
 			# Choose a random layer for injection
 			randnum = random.randint(0, len(model.layers) - 2)
 
+			randnum = 2
 			fiLayer = model.layers[randnum]
-
+			
 			# Get the outputs of the chosen layer
 			get_output = K.function([model.layers[0].input], [fiLayer.output])
 			fiLayerOutputs = get_output([x_test])
